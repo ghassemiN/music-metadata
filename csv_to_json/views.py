@@ -6,7 +6,13 @@ import csv
 import json
 import sys
 import os
+from rest_framework.viewsets import ModelViewSet
+from .serializers import ContributersSerializer
 
+
+class songViewSet(ModelViewSet):
+    serializer_class = ContributersSerializer
+    queryset = songs.objects.all()
 # Create your views here.
 def index(request):
 	context={

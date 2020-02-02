@@ -15,8 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from .api import router
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include('csv_to_json.urls'))
+    path('',include('csv_to_json.urls')),
+    path('api/', include(router.urls))
 ]

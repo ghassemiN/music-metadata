@@ -1,20 +1,25 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from os.path import dirname
-from .models import contributers, songs, song_contributer
+from django.shortcuts import redirect
+from .models import csvfile
 import csv
-import json
 import sys
 import os
 from rest_framework.viewsets import ModelViewSet
 from .serializers import ContributersSerializer
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from collections import OrderedDict 
 
 
 class songViewSet(ModelViewSet):
     serializer_class = ContributersSerializer
-    queryset = songs.objects.all()
+    queryset = csvfile.objects.all()
+
 # Create your views here.
 def index(request):
+
 	context={
 	'title': "This is test",
     'desc': "Upload the CSV file",
@@ -23,33 +28,19 @@ def index(request):
 
 def upload(request):
     if request.method == 'POST':
-        handle_uploaded_file(request.FILES['file'], str(request.FILES['file']))
+    	handle_uploaded_file(request.FILES['file'], str(request.FILES['file']))
+    	df = pd.read_csv('upload/' + request.FILES['file'].name)
+    	df = df.groupby('iswc').agg({'title':'first', 'contributors': '|' .join}).reset_index()
+    	df['contributors'] = (df['contributors'].str.split('|').apply(lambda x: OrderedDict.fromkeys(x).keys()).str.join('|'))
+    	df.to_csv('upload/ress.csv')
 
-        # CSV to Array
-        with open('upload/' + request.FILES['file'].name, newline='') as f:
-        	render=csv.reader(f)
-        	yourlist=list(render)
-
-        #remove first row beacuse it is emty
-       	yourlist.remove(yourlist[0])
-
-        #Sort the list to forward empty iswc to bottom of the list
-        yourlist = sorted(yourlist, key=lambda x: x[2], reverse=True)
-
-        for i in yourlist:
-        	list_contributers=i[1].split('|')
-
-        	song_title=i[0]
-        	iswc=i[2]
-        	into_song_table=songs.objects.get_or_create(title=song_title,iswc=iswc)
-        	into_song_table=songs.objects.last()
-        	
-        	for index_contributer in list_contributers:
-        		into_contrib_table=contributers.objects.get_or_create(contributer=index_contributer)
-        		into_contrib_table=contributers.objects.get(contributer=index_contributer)
-        		into_song_contributer_table=song_contributer.objects.get_or_create(contributer_id=into_contrib_table.id,song_id=into_song_table.id)
-
-       	return HttpResponse("Successful")
+    with open('upload/ress.csv', newline='') as f:
+    	reader=csv.reader(f)
+    	for i in reader:
+    		create=csvfile.objects.get_or_create(title=i[2],iswc=i[1],contributer=i[3])
+    		
+    	#If it is successful then redirect to api
+    	return redirect('../api')
 
     return HttpResponse("Failed")
 
@@ -63,4 +54,3 @@ def handle_uploaded_file(file, filename):
             destination.write(chunk)
 
     return ('upload/'+filename)
-    

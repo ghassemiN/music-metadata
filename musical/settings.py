@@ -78,8 +78,8 @@ WSGI_APPLICATION = 'musical.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'test',
-        'USER':'myuser',
+        'NAME': 'songdb',
+        'USER':'songuser',
         'PASSWORD':'root',
         'HOST':'localhost',
         # 'PORT':'',

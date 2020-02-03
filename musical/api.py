@@ -4,4 +4,4 @@ from csv_to_json.views import songViewSet
  
 router = DefaultRouter()
  
-router.register('songs', songViewSet)
+router.register('metadata', songViewSet)

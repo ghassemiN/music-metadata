@@ -1,10 +1,10 @@
  
 from rest_framework.serializers import ModelSerializer
-from .models import songs
+from .models import csvfile
  
  
 class ContributersSerializer(ModelSerializer):
     class Meta:
-        model = songs
-        fields = ('title','iswc')
+        model = csvfile
+        fields = ('title','iswc','contributer')
  

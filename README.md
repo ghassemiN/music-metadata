@@ -1,2 +1,2 @@
 It's just a python django task.
-It gets CSV file (certain field) through upload form, then save its data into DB after converting in list.
+get CSV file and save it's data into db, then by using REST API response json data.
